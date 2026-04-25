@@ -4,10 +4,20 @@ from database import data_engine
 import fitz  # PyMuPDF
 import os
 from dotenv import load_dotenv
+from pydantic import BaseModel
+from typing import List, Optional
 
 load_dotenv()  # Load variables from .env
 
 NVIDIA_NIM_API_KEY = os.getenv("NVIDIA_NIM_API_KEY")
+
+class Anomaly(BaseModel):
+    hcpcs: str
+    z_score: float
+
+class ComplaintRequest(BaseModel):
+    npi: str
+    anomalies: List[Anomaly] = []
 
 app = FastAPI(title="Clawback AI API")
 
@@ -81,9 +91,15 @@ async def analyze_provider(npi: str):
     return {"npi": npi, "stats": formatted_stats}
 
 @app.post("/generate-complaint")
-async def generate_complaint(npi: str, anomalies: list):
+async def generate_complaint(request: ComplaintRequest):
+    npi = request.npi
+    anomalies = request.anomalies
+    
     # This would call Nvidia NIM to synthesize the draft
     # Placeholder for now
+    hcpcs_list = [a.hcpcs for a in anomalies]
+    max_z = max([a.z_score for a in anomalies] or [0])
+    
     complaint_draft = f"""
     UNITED STATES DISTRICT COURT
     FOR THE DISTRICT OF [STATE]
@@ -99,8 +115,8 @@ async def generate_complaint(npi: str, anomalies: list):
     COMPLAINT FOR VIOLATION OF THE FALSE CLAIMS ACT
     
     1. This is an action to recover treble damages and civil penalties on behalf of the United States...
-    2. Defendant {npi} has engaged in systematic upcoding and fraudulent billing for HCPCS codes: {', '.join([a['hcpcs'] for a in anomalies])}.
-    3. Data analysis reveals that Defendant's billing patterns are statistical outliers, with Z-scores as high as {max([a['z_score'] for a in anomalies] or [0]):.2f} compared to national averages.
+    2. Defendant {npi} has engaged in systematic upcoding and fraudulent billing for HCPCS codes: {', '.join(hcpcs_list) if hcpcs_list else 'Multiple Codes'}.
+    3. Data analysis reveals that Defendant's billing patterns are statistical outliers, with Z-scores as high as {max_z:.2f} compared to national averages.
     """
     return {"complaint_draft": complaint_draft}
 
