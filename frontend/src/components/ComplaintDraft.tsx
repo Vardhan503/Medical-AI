@@ -15,8 +15,11 @@ export default function ComplaintDraft({ npi }: ComplaintDraftProps) {
   useEffect(() => {
     const generate = async () => {
       try {
-        // In a real app, we'd pass the actual anomalies found
-        const response = await axios.post(`http://localhost:8000/generate-complaint?npi=${npi}`, []);
+        // Passing npi and empty anomalies list as expected by the backend
+        const response = await axios.post(`http://localhost:8000/generate-complaint`, {
+          npi: npi,
+          anomalies: []
+        });
         setDraft(response.data.complaint_draft);
       } catch (error) {
         console.error("Generation failed", error);

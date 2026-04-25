@@ -31,7 +31,6 @@ export default function Home() {
         <nav className="flex gap-8 text-sm font-medium text-slate-400">
           <button onClick={() => setView('app')} className={`hover:text-white transition-colors ${view === 'app' ? 'text-white' : ''}`}>Dashboard</button>
           <button onClick={() => setView('history')} className={`hover:text-white transition-colors ${view === 'history' ? 'text-white' : ''}`}>History</button>
-          <button className="hover:text-white transition-colors">Settings</button>
         </nav>
       </header>
 
