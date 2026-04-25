@@ -2,6 +2,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, Search, FileSignature, BarChart3, ChevronRight } from 'lucide-react';
+import FileUpload from '@/components/FileUpload';
+import ProviderAnalysis from '@/components/ProviderAnalysis';
 import ComplaintDraft from '@/components/ComplaintDraft';
 import { AlertTriangle } from 'lucide-react';
 
